@@ -740,26 +740,32 @@ extension DropDown {
 		return (x, y, width, offscreenHeight)
 	}
 
-	fileprivate func computeLayoutForTopDisplay(window: UIWindow) -> ComputeLayoutTuple {
-		var offscreenHeight: CGFloat = 0
+    fileprivate func computeLayoutForTopDisplay(window: UIWindow) -> ComputeLayoutTuple {
+        var offscreenHeight: CGFloat = 0
 
-		let anchorViewX = anchorView?.plainView.windowFrame?.minX ?? 0
-		let anchorViewMaxY = anchorView?.plainView.windowFrame?.maxY ?? 0
+        let anchorViewX = anchorView?.plainView.windowFrame?.minX ?? 0
+        let anchorViewMaxY = anchorView?.plainView.windowFrame?.maxY ?? 0
 
-		let x = anchorViewX + topOffset.x
-		var y = (anchorViewMaxY + topOffset.y) - tableHeight
+        let x = anchorViewX + topOffset.x
+        var y = (anchorViewMaxY + topOffset.y) - tableHeight
+        var windowYAix = window.bounds.minY
+               
+        if #available(iOS 11.0, *) {
+            windowYAix = window.safeAreaInsets.top
+        } else {
+           // Fallback on earlier versions
+        }
+        let windowY = windowYAix + DPDConstant.UI.HeightPadding
 
-		let windowY = window.bounds.minY + DPDConstant.UI.HeightPadding
-
-		if y < windowY {
-			offscreenHeight = abs(y - windowY)
-			y = windowY
-		}
-		
-		let width = self.width ?? (anchorView?.plainView.bounds.width ?? fittingWidth()) - topOffset.x
-		
-		return (x, y, width, offscreenHeight)
-	}
+        if y < windowY {
+            offscreenHeight = abs(y - windowY)
+            y = windowY
+        }
+        
+        let width = self.width ?? (anchorView?.plainView.bounds.width ?? fittingWidth()) - topOffset.x
+        
+        return (x, y, width, offscreenHeight)
+    }
 	
 	fileprivate func fittingWidth() -> CGFloat {
 		if templateCell == nil {
